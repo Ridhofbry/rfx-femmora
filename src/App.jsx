@@ -9,16 +9,16 @@ import {
 } from 'lucide-react';
 // --- KONFIGURASI FIREBASE KAMU (SUDAH DIISI) ---
 const firebaseConfig = {
-  apiKey: "AIzaSyBt2lZIbFHsiQB9TMsR3kxTBuXUVzTrLuA",
-  authDomain: "rfx-femmora-web.firebaseapp.com",
-  projectId: "rfx-femmora-web",
-  storageBucket: "rfx-femmora-web.firebasestorage.app",
-  messagingSenderId: "236566835727",
-  appId: "1:236566835727:web:1101f1c7a7af4ddf74297a"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 // --- API KEY GEMINI (SUDAH DIISI) ---
-const GEMINI_API_KEY = "AIzaSyCY0V90M-qGf7ZOa3BFykcdg6hUO4b0xJw"; 
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
