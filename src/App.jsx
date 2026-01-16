@@ -72,12 +72,13 @@ const GlobalStyles = () => (
 // --- COMPONENTS ---
 const BrandLogo = ({ onClick }) => (
   <div className="relative group cursor-pointer select-none transform transition-transform duration-300 hover:scale-105 flex items-center gap-2" onClick={onClick}>
-    <div className="bg-gradient-to-br from-cyan-500 to-pink-500 p-1.5 rounded-lg shadow-lg">
-       <LayoutGrid className="text-white w-5 h-5" />
+    <div className="bg-gradient-to-br from-cyan-500 to-pink-500 p-1.5 rounded-lg shadow-lg shrink-0">
+       <LayoutGrid className="text-white w-4 h-4 md:w-5 md:h-5" />
     </div>
-    <div className="flex items-baseline gap-1">
-      <span className="font-rfx text-2xl tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-cyan-300 to-cyan-600 drop-shadow-sm filter drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]">RFX</span>
-      <span className="font-femmora font-bold text-xl text-transparent bg-clip-text bg-gradient-to-b from-pink-300 to-pink-600 drop-shadow-sm filter drop-shadow-[0_0_8px_rgba(236,72,153,0.4)]">FEMMORA</span>
+    <div className="flex items-baseline gap-1 shrink-0">
+      {/* Teks mengecil di mobile (text-xl) dan normal di desktop (text-2xl) agar tidak menabrak tombol admin */}
+      <span className="font-rfx text-xl md:text-2xl tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-cyan-300 to-cyan-600 drop-shadow-sm filter drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]">RFX</span>
+      <span className="font-femmora font-bold text-lg md:text-xl text-transparent bg-clip-text bg-gradient-to-b from-pink-300 to-pink-600 drop-shadow-sm filter drop-shadow-[0_0_8px_rgba(236,72,153,0.4)]">FEMMORA</span>
     </div>
   </div>
 );
@@ -101,7 +102,7 @@ const Navbar = ({ activeTab, setActiveTab, onAdminClick, isAdminMode }) => (
             <Star className={`w-4 h-4 mr-2 ${activeTab === 'testimoni' ? 'text-yellow-400' : 'text-slate-500'}`} /> Testimoni
           </button>
         </div>
-        <div>
+        <div className="shrink-0 ml-2">
            <button onClick={onAdminClick} className={`p-2.5 rounded-lg transition-all duration-300 border ${isAdminMode ? 'bg-gradient-to-r from-red-500 to-orange-500 border-red-400 text-white shadow-lg shadow-red-500/20' : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-600'}`} title={isAdminMode ? "Keluar Admin" : "Masuk Admin"}>
              {isAdminMode ? <LogOut className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
            </button>
