@@ -5,7 +5,7 @@ import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, or
 import { 
   Palette, ShoppingCart, Star, Trash2, Plus, LayoutGrid, MessageCircle, 
   LogIn, LogOut, Image as ImageIcon, Lock, Edit, Home, Bot, Send, Sparkles, 
-  X, Loader2, Gamepad2, Video, Smartphone, ShieldCheck, Zap, Heart, User, SendHorizontal
+  X, Loader2, Gamepad2, Video, Smartphone, ShieldCheck, Zap, Heart, User, SendHorizontal, Menu
 } from 'lucide-react';
 
 // --- CONFIG ---
@@ -73,55 +73,90 @@ const GlobalStyles = () => (
 const BrandLogo = ({ onClick }) => (
   <div className="relative group cursor-pointer select-none transform transition-transform duration-300 hover:scale-105 flex items-center gap-2" onClick={onClick}>
     <div className="bg-gradient-to-br from-cyan-500 to-pink-500 p-1.5 rounded-lg shadow-lg shrink-0">
-       <LayoutGrid className="text-white w-4 h-4 md:w-5 md:h-5" />
+       <LayoutGrid className="text-white w-5 h-5" />
     </div>
     <div className="flex items-baseline gap-1 shrink-0">
-      {/* UPDATED: Ukuran teks disesuaikan agar tidak menabrak di layar kecil */}
-      <span className="font-rfx text-lg sm:text-xl md:text-2xl tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-cyan-300 to-cyan-600 drop-shadow-sm filter drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]">RFX</span>
-      <span className="font-femmora font-bold text-base sm:text-lg md:text-xl text-transparent bg-clip-text bg-gradient-to-b from-pink-300 to-pink-600 drop-shadow-sm filter drop-shadow-[0_0_8px_rgba(236,72,153,0.4)]">FEMMORA</span>
+      <span className="font-rfx text-xl md:text-2xl tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-cyan-300 to-cyan-600 drop-shadow-sm filter drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]">RFX</span>
+      <span className="font-femmora font-bold text-lg md:text-xl text-transparent bg-clip-text bg-gradient-to-b from-pink-300 to-pink-600 drop-shadow-sm filter drop-shadow-[0_0_8px_rgba(236,72,153,0.4)]">FEMMORA</span>
     </div>
   </div>
 );
 
-const Navbar = ({ activeTab, setActiveTab, onAdminClick, isAdminMode }) => (
-  <nav className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-white/5 font-body shadow-lg">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="flex items-center justify-between h-20">
-        <BrandLogo onClick={() => setActiveTab('home')} />
-        
-        {/* UPDATED: Menggunakan lg:flex agar menu desktop hanya muncul di layar besar (Laptop), tidak di Tablet */}
-        <div className="hidden lg:flex items-center gap-1 bg-slate-900/50 p-1 rounded-xl border border-white/5 backdrop-blur-md">
-          <button onClick={() => setActiveTab('home')} className={`flex items-center px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${activeTab === 'home' ? 'bg-slate-800 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/30'}`}>
-            <Home className={`w-4 h-4 mr-2 ${activeTab === 'home' ? 'text-indigo-400' : 'text-slate-500'}`} /> Home
-          </button>
-          <button onClick={() => setActiveTab('rfx')} className={`flex items-center px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${activeTab === 'rfx' ? 'bg-slate-800 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/30'}`}>
-            <Palette className={`w-4 h-4 mr-2 ${activeTab === 'rfx' ? 'text-cyan-400' : 'text-slate-500'}`} /> RFX Visual
-          </button>
-          <button onClick={() => setActiveTab('femmora')} className={`flex items-center px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${activeTab === 'femmora' ? 'bg-slate-800 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/30'}`}>
-            <ShoppingCart className={`w-4 h-4 mr-2 ${activeTab === 'femmora' ? 'text-pink-400' : 'text-slate-500'}`} /> Femmora Store
-          </button>
-          <button onClick={() => setActiveTab('testimoni')} className={`flex items-center px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${activeTab === 'testimoni' ? 'bg-slate-800 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/30'}`}>
-            <Star className={`w-4 h-4 mr-2 ${activeTab === 'testimoni' ? 'text-yellow-400' : 'text-slate-500'}`} /> Testimoni
-          </button>
-        </div>
+const Navbar = ({ activeTab, setActiveTab, onAdminClick, isAdminMode }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-        <div className="shrink-0 ml-2">
-           <button onClick={onAdminClick} className={`p-2.5 rounded-lg transition-all duration-300 border ${isAdminMode ? 'bg-gradient-to-r from-red-500 to-orange-500 border-red-400 text-white shadow-lg shadow-red-500/20' : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-600'}`} title={isAdminMode ? "Keluar Admin" : "Masuk Admin"}>
-             {isAdminMode ? <LogOut className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-           </button>
+  const handleNavClick = (tab) => {
+    setActiveTab(tab);
+    setIsMenuOpen(false);
+  };
+
+  return (
+    <nav className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-white/5 font-body shadow-lg">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20">
+          
+          {/* KIRI: Logo */}
+          <BrandLogo onClick={() => handleNavClick('home')} />
+          
+          {/* TENGAH: Desktop Menu (Hidden di Mobile) */}
+          <div className="hidden lg:flex items-center gap-1 bg-slate-900/50 p-1 rounded-xl border border-white/5 backdrop-blur-md">
+            <button onClick={() => setActiveTab('home')} className={`flex items-center px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${activeTab === 'home' ? 'bg-slate-800 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/30'}`}>
+              <Home className={`w-4 h-4 mr-2 ${activeTab === 'home' ? 'text-indigo-400' : 'text-slate-500'}`} /> Home
+            </button>
+            <button onClick={() => setActiveTab('rfx')} className={`flex items-center px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${activeTab === 'rfx' ? 'bg-slate-800 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/30'}`}>
+              <Palette className={`w-4 h-4 mr-2 ${activeTab === 'rfx' ? 'text-cyan-400' : 'text-slate-500'}`} /> RFX Visual
+            </button>
+            <button onClick={() => setActiveTab('femmora')} className={`flex items-center px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${activeTab === 'femmora' ? 'bg-slate-800 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/30'}`}>
+              <ShoppingCart className={`w-4 h-4 mr-2 ${activeTab === 'femmora' ? 'text-pink-400' : 'text-slate-500'}`} /> Femmora Store
+            </button>
+            <button onClick={() => setActiveTab('testimoni')} className={`flex items-center px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${activeTab === 'testimoni' ? 'bg-slate-800 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/30'}`}>
+              <Star className={`w-4 h-4 mr-2 ${activeTab === 'testimoni' ? 'text-yellow-400' : 'text-slate-500'}`} /> Testimoni
+            </button>
+          </div>
+
+          {/* KANAN: Tombol Admin & Hamburger (Mobile) */}
+          <div className="flex items-center gap-3">
+             <button 
+               onClick={onAdminClick} 
+               className={`p-2.5 rounded-xl transition-all duration-300 border flex items-center justify-center ${isAdminMode ? 'bg-gradient-to-r from-red-500 to-orange-500 border-red-400 text-white shadow-lg shadow-red-500/20' : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-600'}`} 
+               title={isAdminMode ? "Keluar Admin" : "Masuk Admin"}
+             >
+               {isAdminMode ? <LogOut className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
+             </button>
+
+             {/* Hamburger Button (Mobile Only) */}
+             <button 
+               onClick={() => setIsMenuOpen(!isMenuOpen)}
+               className="lg:hidden p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+             >
+               {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+             </button>
+          </div>
         </div>
       </div>
-    </div>
-    
-    {/* UPDATED: Mobile Menu muncul di layar Tablet & HP (lg:hidden) */}
-    <div className="lg:hidden fixed bottom-6 left-4 right-4 z-40 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-2 flex justify-around">
-         <button onClick={() => setActiveTab('home')} className={`p-3 rounded-xl transition-all ${activeTab === 'home' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30' : 'text-gray-500'}`}><Home className="w-5 h-5" /></button>
-         <button onClick={() => setActiveTab('rfx')} className={`p-3 rounded-xl transition-all ${activeTab === 'rfx' ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/30' : 'text-gray-500'}`}><Palette className="w-5 h-5" /></button>
-         <button onClick={() => setActiveTab('femmora')} className={`p-3 rounded-xl transition-all ${activeTab === 'femmora' ? 'bg-pink-600 text-white shadow-lg shadow-pink-500/30' : 'text-gray-500'}`}><ShoppingCart className="w-5 h-5" /></button>
-         <button onClick={() => setActiveTab('testimoni')} className={`p-3 rounded-xl transition-all ${activeTab === 'testimoni' ? 'bg-yellow-600 text-white shadow-lg shadow-yellow-500/30' : 'text-gray-500'}`}><Star className="w-5 h-5" /></button>
-    </div>
-  </nav>
-);
+
+      {/* MOBILE DROPDOWN MENU (Hamburger Content) */}
+      {isMenuOpen && (
+        <div className="lg:hidden absolute top-20 left-0 right-0 bg-slate-950/95 backdrop-blur-xl border-b border-white/10 p-4 shadow-2xl animate-in slide-in-from-top-5 z-40">
+          <div className="flex flex-col space-y-2">
+            <button onClick={() => handleNavClick('home')} className={`flex items-center px-4 py-3 rounded-xl font-bold transition-all ${activeTab === 'home' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-900 hover:text-white'}`}>
+              <Home className="w-5 h-5 mr-3 text-indigo-400" /> Home
+            </button>
+            <button onClick={() => handleNavClick('rfx')} className={`flex items-center px-4 py-3 rounded-xl font-bold transition-all ${activeTab === 'rfx' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-900 hover:text-white'}`}>
+              <Palette className="w-5 h-5 mr-3 text-cyan-400" /> RFX Visual
+            </button>
+            <button onClick={() => handleNavClick('femmora')} className={`flex items-center px-4 py-3 rounded-xl font-bold transition-all ${activeTab === 'femmora' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-900 hover:text-white'}`}>
+              <ShoppingCart className="w-5 h-5 mr-3 text-pink-400" /> Femmora Store
+            </button>
+            <button onClick={() => handleNavClick('testimoni')} className={`flex items-center px-4 py-3 rounded-xl font-bold transition-all ${activeTab === 'testimoni' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-900 hover:text-white'}`}>
+              <Star className="w-5 h-5 mr-3 text-yellow-400" /> Testimoni
+            </button>
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+};
 
 const AIChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
