@@ -86,7 +86,15 @@ export default function App() {
   // --- 3. RENDER (Updated Layout for Luxury) ---
   return (
     <div className="min-h-screen bg-luxury-black text-slate-200 font-body selection:bg-rfx-primary/30 pb-32 md:pb-0 overflow-x-hidden">
-      
+      {showLoginModal && (
+  <LoginModal 
+    onClose={() => setShowLoginModal(false)} 
+    onSuccess={() => { 
+      setIsAdminMode(true); 
+      setIsCommanderMode(true); // <--- INI PENTING
+    }} 
+  />
+)}
       {/* Navbar tidak lagi menerima prop Admin */}
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
       
