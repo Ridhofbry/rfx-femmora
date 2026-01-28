@@ -51,6 +51,16 @@ export default function App() {
     return onAuthStateChanged(auth, (u) => setUser(u));
   }, []);
 
+  // --- LOGIKA BARU UNTUK APK (MEDIAN.CO) ---
+  useEffect(() => {
+    // Cek apakah ada '?mode=app' di URL
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('mode') === 'app') {
+      // Langsung buka login modal
+      setShowLoginModal(true);
+    }
+  }, []);
+
   useEffect(() => {
     if (!user) return;
     const subscribe = (subColl, setter) => {
@@ -91,8 +101,8 @@ export default function App() {
       {isCommanderMode && (
          <CommanderApp 
             onClose={() => {
-              setIsCommanderMode(false); // Tutup tampilan HP
-              setIsAdminMode(false);     // FIX BUG: MATIKAN JUGA AKSES ADMIN BIASA
+              setIsCommanderMode(false); 
+              setIsAdminMode(false); 
             }} 
             rfxItems={rfxItems} 
             femmoraItems={femmoraItems} 
@@ -103,7 +113,6 @@ export default function App() {
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
-        
         {/* --- HERO SECTION --- */}
         {activeTab === 'home' && (
           <div className="space-y-32 animate-pop pt-10">
@@ -227,8 +236,6 @@ export default function App() {
       </main>
 
       <AIChatBot />
-      
-      {/* Footer Menerima Fungsi Secret Trigger */}
       <Footer onSecretTrigger={() => !isAdminMode && setShowLoginModal(true)} />
 
       {/* RENDER MODALS */}
@@ -243,7 +250,7 @@ export default function App() {
           onClose={() => setShowLoginModal(false)} 
           onSuccess={() => { 
             setIsAdminMode(true); 
-            setIsCommanderMode(true); // Mengaktifkan Tampilan HP
+            setIsCommanderMode(true); 
           }} 
         />
       )}
