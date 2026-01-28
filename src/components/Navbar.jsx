@@ -1,6 +1,21 @@
+// Hapus import LayoutGrid jika tidak dipakai lagi, atau biarkan saja tidak apa-apa
 import React, { useState } from 'react';
-import { Home, Palette, ShoppingCart, Star, Menu, X, LayoutGrid } from 'lucide-react';
+import { Home, Palette, ShoppingCart, Star, Menu, X } from 'lucide-react'; // LayoutGrid dihapus dari sini opsional
 
+// ... kode lain ...
+
+ // Logo Mewah (Text Only - Tanpa Kotak)
+  const BrandLogo = ({ onClick }) => (
+    <div className="relative group cursor-pointer select-none transform transition-transform duration-300 hover:scale-105 flex items-center gap-2" onClick={onClick}>
+      {/* BAGIAN KOTAK HILANG DISINI */}
+      <div className="flex items-baseline gap-1 shrink-0">
+        <span className="font-rfx text-xl md:text-2xl tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-cyan-300 to-cyan-600 drop-shadow-sm filter drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]">RFX</span>
+        <span className="font-femmora font-bold text-lg md:text-xl text-transparent bg-clip-text bg-gradient-to-b from-pink-300 to-pink-600 drop-shadow-sm filter drop-shadow-[0_0_8px_rgba(236,72,153,0.4)]">FEMMORA</span>
+      </div>
+    </div>
+  );
+
+// ... sisanya sama ...
 const Navbar = ({ activeTab, setActiveTab }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
