@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
-import { LayoutGrid, Plus, Trash2, X, Zap, Activity, ScanLine, LogOut, Image as ImageIcon } from 'lucide-react';
+import { 
+  LayoutGrid, Plus, Trash2, X, Zap, Activity, 
+  ScanLine, LogOut, Image as ImageIcon 
+} from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db, APP_ID, generateGeminiContent } from '../config/firebase';
 
-// --- KOMPONEN UI "ONYX" (DIPINDAH KE LUAR AGAR BISA DIBACA) ---
+// ==========================================
+// 1. KOMPONEN KECIL (DITARUH DI ATAS)
+// ==========================================
 
 const OnyxCard = ({ title, count, color, icon: Icon, onClick }) => (
-  <div onClick={() => { if (navigator.vibrate) navigator.vibrate(15); onClick(); }} className="bg-[#111] active:bg-[#222] border border-[#333] p-5 rounded-2xl flex items-center justify-between transition-all active:scale-95 mb-4 cursor-pointer">
+  <div 
+    onClick={() => { if (navigator.vibrate) navigator.vibrate(15); onClick(); }} 
+    className="bg-[#111] active:bg-[#222] border border-[#333] p-5 rounded-2xl flex items-center justify-between transition-all active:scale-95 mb-4 cursor-pointer"
+  >
     <div>
       <div className={`text-[10px] tracking-[0.2em] font-bold mb-1 uppercase ${color}`}>{title}</div>
       <div className="text-3xl font-black text-white font-mono">{count}</div>
@@ -24,7 +32,114 @@ const OnyxInput = ({ label, ...props }) => (
   </div>
 );
 
-// --- MAIN COMPONENT ---
+// ==========================================
+// 2. FORMULIR INPUT (DITARUH DI ATAS JUGA)
+// ==========================================
+
+const OnyxForm = ({ view, onBack, onSubmit, loading }) => {
+  const [form, setForm] = useState({ title: '', price: '', desc: '', imageUrl: '' });
+  
+  // Tentukan tipe
+  const type = view === 'add_rfx' ? 'rfx' : view === 'add_fem' ? 'femmora' : 'gallery';
+  const color = type === 'rfx' ? 'text-cyan-400' : type === 'femmora' ? 'text-pink-400' : 'text-yellow-400';
+
+  const handleGenAI = async () => {
+    if(!form.title) return alert("Isi Judul Dulu Boss!");
+    
+    const prompt = `Buat deskripsi marketing singkat, gaul, emoji on, untuk produk: ${form.title}. Konteks: RFX Femmora.`;
+    
+    try {
+        // Efek loading manual kalau mau (opsional)
+        const res = await generateGeminiContent(prompt);
+        setForm(prev => ({...prev, desc: res}));
+    } catch (error) {
+        alert("Gagal konek ke otak Rexa.");
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black z-[110] flex flex-col font-body animate-in slide-in-from-bottom-10">
+      {/* Header Form */}
+      <div className="p-6 pt-12 flex items-center gap-4 border-b border-[#222] bg-black">
+        <button onClick={onBack} className="p-2 bg-[#111] rounded-lg text-white hover:bg-[#222] border border-[#333]">
+           <X size={20}/>
+        </button>
+        <div className={`font-black text-xl tracking-wider uppercase ${color}`}>NEW {type}</div>
+      </div>
+      
+      {/* Body Form */}
+      <div className="p-6 flex-1 overflow-y-auto pb-32">
+        <OnyxInput 
+          label="CODENAME / TITLE" 
+          placeholder="ex: Logo Esport / Netflix 1 Bulan" 
+          value={form.title} 
+          onChange={e=>setForm({...form, title: e.target.value})} 
+        />
+        
+        {type !== 'gallery' && (
+          <OnyxInput 
+            label="PRICE (IDR)" 
+            placeholder="ex: 50.000" 
+            type="number" 
+            value={form.price} 
+            onChange={e=>setForm({...form, price: e.target.value})} 
+          />
+        )}
+        
+        <div className="mb-4">
+           <div className="flex justify-between mb-2">
+             <label className="text-[10px] text-gray-500 tracking-[0.2em] uppercase">DESCRIPTION</label>
+             {type !== 'gallery' && (
+               <button onClick={handleGenAI} className="text-[10px] text-cyan-400 font-bold bg-cyan-900/20 border border-cyan-500/30 px-3 py-1 rounded hover:bg-cyan-900/50 transition-colors">
+                 ✨ GENERATE AI
+               </button>
+             )}
+           </div>
+           <textarea 
+             className="w-full bg-black border border-[#333] text-white p-4 rounded-xl focus:border-cyan-500 outline-none font-mono text-sm h-32 placeholder:text-gray-700 resize-none" 
+             value={form.desc} 
+             onChange={e=>setForm({...form, desc: e.target.value})} 
+             placeholder="Deskripsi produk..." 
+           />
+        </div>
+
+        <OnyxInput 
+          label="IMAGE URL" 
+          placeholder="https://..." 
+          value={form.imageUrl} 
+          onChange={e=>setForm({...form, imageUrl: e.target.value})} 
+        />
+        
+        {/* Preview Image */}
+        {form.imageUrl && (
+            <div className="mb-6 rounded-xl overflow-hidden border border-[#333] h-40 bg-[#111]">
+                <img 
+                  src={form.imageUrl} 
+                  className="w-full h-full object-cover opacity-70" 
+                  onError={(e) => e.target.src='https://placehold.co/600x400/000000/FFF?text=Error+Loading'} 
+                  alt="Preview"
+                />
+            </div>
+        )}
+      </div>
+
+      {/* Footer / Tombol Submit */}
+      <div className="p-6 bg-black border-t border-[#222] absolute bottom-0 left-0 right-0">
+        <button 
+          disabled={loading} 
+          onClick={() => onSubmit({ ...form, type })} 
+          className={`w-full ${loading ? 'bg-gray-800' : 'bg-white'} text-black font-black py-4 rounded-xl tracking-widest uppercase transition-all active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.2)]`}
+        >
+          {loading ? 'DEPLOYING...' : 'CONFIRM DEPLOY'}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// ==========================================
+// 3. KOMPONEN UTAMA (PALING BAWAH)
+// ==========================================
 
 const CommanderApp = ({ onClose, rfxItems, femmoraItems, galleryItems }) => {
   const [view, setView] = useState('dashboard'); // dashboard, add_rfx, add_fem, add_gallery
@@ -40,15 +155,18 @@ const CommanderApp = ({ onClose, rfxItems, femmoraItems, galleryItems }) => {
     triggerHaptic();
     setLoading(true);
     const mapColl = { 'rfx': 'rfx_services', 'femmora': 'femmora_products', 'gallery': 'admin_gallery' };
+    
     try {
       await addDoc(collection(db, 'artifacts', APP_ID, 'public', 'data', mapColl[data.type]), { ...data, createdAt: serverTimestamp() });
       alert("SUCCESS COMMANDER! Item deployed.");
       setView('dashboard');
-    } catch (e) { alert("ERROR: " + e.message); }
+    } catch (e) { 
+      alert("ERROR: " + e.message); 
+    }
     setLoading(false);
   };
 
-  // --- HALAMAN DASHBOARD ---
+  // --- RENDER DASHBOARD ---
   if (view === 'dashboard') {
     return (
       <div className="fixed inset-0 bg-black z-[100] overflow-y-auto pb-20 font-body animate-in fade-in duration-300">
@@ -65,7 +183,9 @@ const CommanderApp = ({ onClose, rfxItems, femmoraItems, galleryItems }) => {
                </div>
              </div>
           </div>
-          <button onClick={onClose} className="p-2 bg-[#111] rounded-full text-gray-500 hover:text-red-500 transition-colors"><LogOut size={20} /></button>
+          <button onClick={onClose} className="p-2 bg-[#111] rounded-full text-gray-500 hover:text-red-500 transition-colors border border-[#333]">
+             <LogOut size={20} />
+          </button>
         </div>
 
         {/* Status Grid */}
@@ -87,69 +207,9 @@ const CommanderApp = ({ onClose, rfxItems, femmoraItems, galleryItems }) => {
     );
   }
 
-  // --- HALAMAN INPUT (Generic Form) ---
+  // --- RENDER FORM INPUT ---
+  // Karena OnyxForm sudah didefinisikan di ATAS, ini aman sekarang.
   return <OnyxForm view={view} onBack={() => setView('dashboard')} onSubmit={handleAdd} loading={loading} />;
-};
-
-// Form Terpisah
-const OnyxForm = ({ view, onBack, onSubmit, loading }) => {
-  const [form, setForm] = useState({ title: '', price: '', desc: '', imageUrl: '' });
-  
-  // Tentukan tipe berdasarkan view
-  const type = view === 'add_rfx' ? 'rfx' : view === 'add_fem' ? 'femmora' : 'gallery';
-  const color = type === 'rfx' ? 'text-cyan-400' : type === 'femmora' ? 'text-pink-400' : 'text-yellow-400';
-
-  const handleGenAI = async () => {
-    if(!form.title) return alert("Isi Judul Dulu!");
-    
-    // Tampilkan loading state sederhana di tombol AI jika perlu, atau biarkan async berjalan
-    const prompt = `Buat deskripsi marketing singkat, gaul, emoji on, untuk produk: ${form.title}. Konteks: RFX Femmora.`;
-    
-    try {
-        const res = await generateGeminiContent(prompt);
-        setForm(prev => ({...prev, desc: res}));
-    } catch (error) {
-        alert("Gagal konek ke otak Rexa.");
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black z-[100] flex flex-col font-body animate-in slide-in-from-bottom-10 overflow-hidden">
-      <div className="p-6 pt-12 flex items-center gap-4 border-b border-[#222]">
-        <button onClick={onBack} className="p-2 bg-[#111] rounded-lg text-white hover:bg-[#222]"><X size={20}/></button>
-        <div className={`font-black text-xl tracking-wider uppercase ${color}`}>NEW {type}</div>
-      </div>
-      
-      <div className="p-6 flex-1 overflow-y-auto">
-        <OnyxInput label="CODENAME / TITLE" placeholder="ex: Logo Esport / Netflix 1 Bulan" value={form.title} onChange={e=>setForm({...form, title: e.target.value})} />
-        
-        {type !== 'gallery' && <OnyxInput label="PRICE (IDR)" placeholder="ex: 50.000" type="number" value={form.price} onChange={e=>setForm({...form, price: e.target.value})} />}
-        
-        <div className="mb-4">
-           <div className="flex justify-between mb-2">
-             <label className="text-[10px] text-gray-500 tracking-[0.2em] uppercase">DESCRIPTION</label>
-             {type !== 'gallery' && <button onClick={handleGenAI} className="text-[10px] text-cyan-400 font-bold bg-cyan-900/30 px-3 py-1 rounded hover:bg-cyan-900/50 transition-colors">✨ GENERATE AI</button>}
-           </div>
-           <textarea className="w-full bg-black border border-[#333] text-white p-4 rounded-xl focus:border-cyan-500 outline-none font-mono text-sm h-32 placeholder:text-gray-700" value={form.desc} onChange={e=>setForm({...form, desc: e.target.value})} placeholder="Deskripsi produk..." />
-        </div>
-
-        <OnyxInput label="IMAGE URL" placeholder="https://..." value={form.imageUrl} onChange={e=>setForm({...form, imageUrl: e.target.value})} />
-        
-        {/* Preview Image */}
-        {form.imageUrl && (
-            <div className="mb-6 rounded-xl overflow-hidden border border-[#333] h-40 bg-[#111]">
-                <img src={form.imageUrl} className="w-full h-full object-cover opacity-70" onError={(e) => e.target.src='https://placehold.co/600x400/000000/FFF?text=Error+Loading'} />
-            </div>
-        )}
-      </div>
-
-      <div className="p-6 bg-black border-t border-[#222]">
-        <button disabled={loading} onClick={() => onSubmit({ ...form, type })} className={`w-full ${loading ? 'bg-gray-800' : 'bg-white'} text-black font-black py-4 rounded-xl tracking-widest uppercase transition-all active:scale-95`}>
-          {loading ? 'DEPLOYING...' : 'CONFIRM DEPLOY'}
-        </button>
-      </div>
-    </div>
-  );
 };
 
 export default CommanderApp;
