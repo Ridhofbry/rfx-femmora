@@ -23,7 +23,8 @@ import EditHomeModal from './modals/EditHomeModal';
 export default function App() {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('home');
-  const [isAdminMode, setIsAdminMode] = useState(false);
+  // Ganti state isAdminMode lama jika perlu, atau tambahkan ini:
+  const [isCommanderMode, setIsCommanderMode] = useState(false);
   
   // Modal States
   const [showAddModal, setShowAddModal] = useState(false);
