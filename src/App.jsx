@@ -87,10 +87,13 @@ export default function App() {
   return (
     <div className="min-h-screen bg-luxury-black text-slate-200 font-body selection:bg-rfx-primary/30 pb-32 md:pb-0 overflow-x-hidden">
       
-      {/* --- COMMANDER APP (Overlay Hitam untuk HP) --- */}
+    {/* --- COMMANDER APP (Overlay Hitam untuk HP) --- */}
       {isCommanderMode && (
          <CommanderApp 
-            onClose={() => setIsCommanderMode(false)} 
+            onClose={() => {
+              setIsCommanderMode(false); // Tutup tampilan HP
+              setIsAdminMode(false);     // MATIKAN AKSES ADMIN (Fix Bug Nyangkut)
+            }} 
             rfxItems={rfxItems} 
             femmoraItems={femmoraItems} 
             galleryItems={galleryItems} 
